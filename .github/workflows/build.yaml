@@ -1,0 +1,49 @@
+name: Build & deploy
+
+on:
+  push:
+    branches-ignore: 
+      - '**'
+    tags:
+      - 'v*'
+
+jobs:
+  x64_win32:
+    runs-on: windows-2019
+
+    defaults:
+      run:
+        shell: cmd
+
+    steps:
+      - uses: microsoft/setup-msbuild@v1.0.2
+      - uses: actions/checkout@v2.2.0
+        with:
+          submodules: 'recursive'
+
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v1.9
+        with:
+          cmake-version: '3.17.x'
+
+      - name: Build Release
+        run: release.bat
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+
+      - name: Upload ClosedIV.asi
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: BUILD/BIN/Release/ClosedIV.asi
+          asset_name: ClosedIV.asi
+          asset_content_type: application/octet-stream
