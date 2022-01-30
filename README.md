@@ -15,5 +15,7 @@ CMake 3.17.x and Visual Studio is needed to build the project. You can run relea
 ## Goals
 - [x] Initial release
 - [ ] Making the code look better
+- [ ] Adding log files
+- [ ] Adding logs to debug mods created by people, so they know what is wrong with their broken stuff
 - [ ] Adding support to replace files without copying the entire RPF
 - [ ] Support RPFs as directories
