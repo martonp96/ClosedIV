@@ -1,17 +1,4 @@
-#include <Windows.h>
-#include <iostream>
-#include <string>
-#include <thread>
-#include "memory.h"
-
-void log(const char* msg, ...)
-{
-	va_list args;
-	va_start(args, msg);
-	vprintf(msg, args);
-	printf("\n");
-	va_end(args);
-}
+#include "main.h"
 
 HANDLE OpenBulkHook(void* device, const char* path, __int64* a3)
 {
@@ -28,7 +15,7 @@ HANDLE OpenBulkHook(void* device, const char* path, __int64* a3)
 		FileW = CreateFileW(WideCharStr, 0x80000000, 1u, 0, 3, 0x80, 0);
 	else
 	{
-		log("[%s] Found mods/%s", __FUNCTION__, path);
+		logger::info("[%s] Found mods/%s", __FUNCTION__, path);
 	}
 
 	return FileW;
@@ -43,7 +30,7 @@ FILETIME GetFileTimeHook(void* device, const char* path)
 
 	if (GetFileAttributesExW((L"mods/" + std::wstring(WideCharStr)).c_str(), GetFileExInfoStandard, &FileInformation))
 	{
-		log("[%s] Found mods/%s", __FUNCTION__, path);
+		logger::info("[%s] Found mods/%s", __FUNCTION__, path);
 		return FileInformation.ftLastWriteTime;
 	}
 	else if (GetFileAttributesExW(WideCharStr, GetFileExInfoStandard, &FileInformation))
@@ -61,10 +48,10 @@ uint64_t GetFileSizeHook(void* device, const char* path)
 
 	if (GetFileAttributesExW((L"mods/" + std::wstring(WideCharStr)).c_str(), GetFileExInfoStandard, &FileInformation))
 	{
-		log("[%s] Found mods/%s", __FUNCTION__, path);
+		logger::info("[%s] Found mods/%s", __FUNCTION__, path);
 		return FileInformation.nFileSizeLow | (static_cast<size_t>(FileInformation.nFileSizeHigh) << 32);
 	}
-	if (GetFileAttributesExW(WideCharStr, GetFileExInfoStandard, &FileInformation))
+	else if (GetFileAttributesExW(WideCharStr, GetFileExInfoStandard, &FileInformation))
 		return FileInformation.nFileSizeLow | (static_cast<size_t>(FileInformation.nFileSizeHigh) << 32);
 	else
 		return 0;
@@ -83,7 +70,7 @@ uint64_t GetAttributesHook(void* device, const char* path)
 		FileAttributesW = GetFileAttributesW(WideCharStr);
 	else
 	{
-		log("[%s] Found mods/%s", __FUNCTION__, path);
+		logger::info("[%s] Found mods/%s", __FUNCTION__, path);
 	}
 	return FileAttributesW;
 }
@@ -100,7 +87,7 @@ void DecryptHeaderHook(uint32_t salt, char* entryTable, int size)
 {
 	if (currentEncryption == 0x4E45504F) //OPEN
 	{
-		log("not encrypted RPF found");
+		logger::info("not encrypted RPF found");
 		return;
 	}
 	DecryptHeaderOrig(salt, entryTable, size);
@@ -111,126 +98,16 @@ void DecryptHeader2Hook(uint32_t encryption, uint32_t salt, char* header, int na
 {
 	if (encryption == 0x4E45504F) //OPEN
 	{
-		log("not encrypted RPF found");
+		logger::info("not encrypted RPF found");
 		return;
 	}
 	DecryptHeader2Orig(encryption, salt, header, nameTableLen);
 }
 
-struct fiPackfile
+bool(*ParseHeaderOrig)(rage::fiPackfile*, const char*, bool, void*);
+bool ParseHeaderHook(rage::fiPackfile* a1, const char* name, bool readHeader, void* customHeader)
 {
-	char pad_0x0000[0x10];
-	char* headers;
-	char* entriesDepth;
-	char* entryTable;
-	__int32 filesCount;
-	char pad_0x002C[4];
-	HANDLE openedFileHandle;
-	char fileTime[8];
-	__int64 currentBulkOffset;
-	__int32 hashSalt;
-	char pad_0x004C[4];
-	void* relativeDevice;
-	char pad_0x0058[0x28];
-	char* packfileName;
-	char pad_0x0088[0x8];
-	char isBinaryEntry;
-	char uint8_0x91;
-	char pad_0x0092[2];
-	__int32 physSortKey;
-	char pad_0x0098[2];
-	__int64 memoryPtr;
-	char pad_0x00000[4];
-	char packFileOpened;
-	char pad_0x00A9[2];
-	char uint8_0xAB;
-	char nameTableStart[4];
-	__int32 currentFileOffset;
-	__int32 encryptionMagic;
-	char uint8_0xB8;
-	char pad_0x00B9[71];
-};
-
-struct DirectoryEntry
-{
-	uint32_t nameOffset;
-	uint32_t entryType;
-	uint32_t entryIndex;
-	uint32_t entriesCnt;
-};
-
-struct BinaryEntry
-{
-	uint16_t nameOffset;
-	uint8_t fileSize[3];
-	uint8_t fileOffset[3];
-	uint32_t realSize;
-	uint32_t isEncrypted;
-
-	uint32_t GetFileSize()
-	{
-		return fileSize[0] + (fileSize[1] << 8) + (fileSize[2] << 16);
-	}
-
-	uint32_t GetFileOffset()
-	{
-		return fileOffset[0] + (fileOffset[1] << 8) + (fileOffset[2] << 16);
-	}
-
-	bool IsCompressed()
-	{
-		return GetFileSize() != 0;
-	}
-};
-
-struct ResourceEntry
-{
-	uint16_t nameOffset;
-	uint8_t fileSize[3];
-	uint8_t fileOffset[3];
-	uint32_t systemFlags;
-	uint32_t graphicsFlags;
-
-	uint32_t GetFileSize()
-	{
-		return fileSize[0] + (fileSize[1] << 8) + (fileSize[2] << 16);
-	}
-
-	uint32_t GetFileOffset()
-	{
-		return (fileOffset[0] + (fileOffset[1] << 8) + (fileOffset[2] << 16)) & 0x7FFFFF;
-	}
-};
-
-struct Entry
-{
-	union
-	{
-		DirectoryEntry dir;
-		BinaryEntry bin;
-		ResourceEntry res;
-	};
-
-	bool IsDirectory()
-	{
-		return dir.entryType == 0x7FFFFF00;
-	}
-
-	bool IsBinary()
-	{
-		return !IsDirectory() && (dir.entryType & 0x80000000) == 0L;
-	}
-
-	bool IsResource()
-	{
-		return !IsDirectory() && !IsBinary();
-	}
-};
-
-bool(*ParseHeaderOrig)(fiPackfile*, const char*, bool, void*);
-bool ParseHeaderHook(fiPackfile* a1, const char* name, bool readHeader, void* customHeader)
-{
-	log("Parsing header for %s", name);
+	logger::info("Parsing header for %s", name);
 
 	bool ret = ParseHeaderOrig(a1, name, readHeader, customHeader);
 	if (ret)
@@ -292,7 +169,7 @@ void HookGetSystemTimeAsFileTime(LPFILETIME lpSystemTimeAsFileTime)
 		ParseHeaderOrig = mem.add(1).rip().as<decltype(ParseHeaderOrig)>();
 		mem.set_call(ParseHeaderHook);
 
-		log("ClosedIV Inited!");
+		logger::info("ClosedIV Inited!");
 	}
 	GetSystemTimeAsFileTime(lpSystemTimeAsFileTime);
 }
@@ -312,7 +189,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  dwReason, LPVOID lpReserved)
 
 		//compatibility for any asi loader, as OpenIV supports only the one made by Alexander Blade
 		if (!memory::HookIAT("kernel32.dll", "GetSystemTimeAsFileTime", (PVOID)HookGetSystemTimeAsFileTime, (PVOID*)&origGetSystemTimeAsFileTime)) {
-			log("[-] Hooking failed error (%ld)", GetLastError());
+			logger::info("[-] Hooking failed error (%ld)", GetLastError());
 		}
     }
     return TRUE;
