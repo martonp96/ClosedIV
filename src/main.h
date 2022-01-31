@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <thread>
+#include <filesystem>
 
 #include "utils/log.h"
 #include "utils/memory.h"

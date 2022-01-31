@@ -15,3 +15,20 @@ void rage::fiDevice::SetPath(const char* path, bool allowRoot, rage::fiDevice* p
 
 	func(this, path, allowRoot, parent);
 }
+
+rage::fiDeviceRelative::fiDeviceRelative()
+{
+	static auto relativeDeviceVMT = memory::scan("48 8D 05 ? ? ? ? 48 89 03 EB ? 33 DB 48 8D 15 ? ? ? ? 45 33 C9").add(3).rip().as<void*>();
+	VMT = relativeDeviceVMT;
+	pad[0xF8] = 0;
+}
+
+bool rage::fiDeviceRelative::Mount(const char* mountPoint)
+{
+	return reinterpret_cast<rage::fiDevice*>(this)->Mount(mountPoint);
+}
+
+void rage::fiDeviceRelative::SetPath(const char* path, bool allowRoot, rage::fiDevice* parent)
+{
+	reinterpret_cast<rage::fiDevice*>(this)->SetPath(path, allowRoot, parent);
+}

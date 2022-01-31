@@ -59,4 +59,15 @@ namespace rage
 		bool Mount(const char* mountPoint);
 		void SetPath(const char* path, bool allowRoot, rage::fiDevice* parent);
 	};
+
+	class __declspec(novtable) fiDeviceRelative
+	{
+		void* VMT;
+		char pad[0x108];
+	public:
+		fiDeviceRelative();
+
+		bool Mount(const char* mountPoint);
+		void SetPath(const char* path, bool allowRoot, rage::fiDevice* parent);
+	};
 }

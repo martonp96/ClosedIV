@@ -1,12 +1,37 @@
 #pragma once
 #include <cstdint>
 #include <vector>
+#include <functional>
+#include "log.h"
 
 class memory {
 public:
 	uintptr_t address;
 	memory(memory& other) : address(other.address) {}
 	memory(uintptr_t offset, bool useBase = false) : address(useBase ? base() + offset : offset) {}
+
+	struct InitFuncs
+	{
+		std::function<void()> fn;
+		static std::vector<InitFuncs>& funcs()
+		{
+			static std::vector<InitFuncs> _funcs;
+			return _funcs;
+		}
+
+		static void run()
+		{
+			for (auto& cb : funcs())
+			{
+				cb.fn();
+			}
+		}
+
+		InitFuncs(const std::function<void()>& fn) : fn(fn)
+		{
+			funcs().push_back(*this);
+		}
+	};
 
     inline static uintptr_t& base()
 	{
@@ -219,6 +244,8 @@ public:
 				return memory((uintptr_t)&scanBytes[i], false);
 			}
 		}
+
+		logger::info("!! Pattern %s not found!", signature);
 		return memory(0, false);
 	}
 
