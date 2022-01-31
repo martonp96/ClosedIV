@@ -20,9 +20,12 @@ CMake 3.17.x and Visual Studio is needed to build the project. You can run relea
 - Place your mods in your mods folder or if you already had some, keep them there
 - Ready to play
 
+## Info
+
+Check the [wiki](https://github.com/martonp96/ClosedIV/wiki) for more information
+
 ## Goals
 - [x] Initial release
-- [ ] Making the code look better
 - [ ] Adding log files
 - [ ] Adding logs to debug mods created by people, so they know what is wrong with their broken stuff
 - [ ] Adding support to replace files without copying the entire RPF
