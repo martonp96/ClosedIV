@@ -12,6 +12,14 @@ This repository contains the source code for ClosedIV.asi, an open source altern
 
 CMake 3.17.x and Visual Studio is needed to build the project. You can run release.bat to build it quickly or use generate_*.bat to create project files for a specific VS version.
 
+## How to install
+
+- Install the recommended ASI loader or the one made by Alexander Blade.
+- Download the latest asi from releases
+- Delete OpenIV.asi if you have it
+- Place your mods in your mods folder or if you already had some, keep them there
+- Ready to play
+
 ## Goals
 - [x] Initial release
 - [ ] Making the code look better
