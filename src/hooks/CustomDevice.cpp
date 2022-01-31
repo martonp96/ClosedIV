@@ -54,7 +54,7 @@ void InitialMountHook()
 }
 
 static memory::InitFuncs CustomDevice([] {
-	auto mem = memory::scan("E8 ? ? ? ? E8 ? ? ? ? B9 ? ? ? ? E8 ? ? ? ? 48 8B D8 48 85 C0 74 14 48 8B C8 E8 ? ? ? ? 48 8D 05 ? ? ? ? 48 89 03 EB 02 33 DB 48 8D 15");
+	auto mem = memory::scan("0F B7 05 ? ? ? ? 48 03 C3 44 88 34 38").add(21);
 	InitialMountOrig = mem.add(1).rip().as<decltype(InitialMountOrig)>();
 	mem.set_call(InitialMountHook);
 });
