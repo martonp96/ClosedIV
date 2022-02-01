@@ -245,7 +245,7 @@ public:
 			}
 		}
 
-		logger::info("!! Pattern %s not found!", signature);
+		logger::write("info", "!! Pattern %s not found!", signature);
 		return memory(0, false);
 	}
 

@@ -2,5 +2,5 @@
 
 namespace logger
 {
-	void info(const char* msg, ...);
+	void write(const char* type, const char* msg, ...);
 }

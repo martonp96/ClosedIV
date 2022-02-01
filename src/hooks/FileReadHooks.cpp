@@ -15,7 +15,7 @@ HANDLE OpenBulkHook(void* device, const char* path, __int64* a3)
 		FileW = CreateFileW(WideCharStr, 0x80000000, 1u, 0, 3, 0x80, 0);
 	else
 	{
-		logger::info("[%s] Found mods/%s", __FUNCTION__, path);
+		logger::write("mods", "[%s] Found mods/%s", __FUNCTION__, path);
 	}
 
 	return FileW;
@@ -30,7 +30,7 @@ FILETIME GetFileTimeHook(void* device, const char* path)
 
 	if (GetFileAttributesExW((L"mods/" + std::wstring(WideCharStr)).c_str(), GetFileExInfoStandard, &FileInformation))
 	{
-		logger::info("[%s] Found mods/%s", __FUNCTION__, path);
+		logger::write("mods", "[%s] Found mods/%s", __FUNCTION__, path);
 		return FileInformation.ftLastWriteTime;
 	}
 	else if (GetFileAttributesExW(WideCharStr, GetFileExInfoStandard, &FileInformation))
@@ -48,7 +48,7 @@ uint64_t GetFileSizeHook(void* device, const char* path)
 
 	if (GetFileAttributesExW((L"mods/" + std::wstring(WideCharStr)).c_str(), GetFileExInfoStandard, &FileInformation))
 	{
-		logger::info("[%s] Found mods/%s", __FUNCTION__, path);
+		logger::write("mods", "[%s] Found mods/%s", __FUNCTION__, path);
 		return FileInformation.nFileSizeLow | (static_cast<size_t>(FileInformation.nFileSizeHigh) << 32);
 	}
 	else if (GetFileAttributesExW(WideCharStr, GetFileExInfoStandard, &FileInformation))
@@ -70,7 +70,7 @@ uint64_t GetAttributesHook(void* device, const char* path)
 		FileAttributesW = GetFileAttributesW(WideCharStr);
 	else
 	{
-		logger::info("[%s] Found mods/%s", __FUNCTION__, path);
+		logger::write("mods", "[%s] Found mods/%s", __FUNCTION__, path);
 	}
 	return FileAttributesW;
 }

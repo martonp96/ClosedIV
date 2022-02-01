@@ -12,7 +12,7 @@ void DecryptHeaderHook(uint32_t salt, char* entryTable, int size)
 {
 	if (currentEncryption == 0x4E45504F) //OPEN
 	{
-		logger::info("not encrypted RPF found");
+		logger::write("mods", "not encrypted RPF found");
 		return;
 	}
 	DecryptHeaderOrig(salt, entryTable, size);
@@ -23,7 +23,7 @@ void DecryptHeader2Hook(uint32_t encryption, uint32_t salt, char* header, int na
 {
 	if (encryption == 0x4E45504F) //OPEN
 	{
-		logger::info("not encrypted RPF found");
+		logger::write("mods", "not encrypted RPF found");
 		return;
 	}
 	DecryptHeader2Orig(encryption, salt, header, nameTableLen);
@@ -32,7 +32,7 @@ void DecryptHeader2Hook(uint32_t encryption, uint32_t salt, char* header, int na
 bool(*ParseHeaderOrig)(rage::fiPackfile*, const char*, bool, void*);
 bool ParseHeaderHook(rage::fiPackfile* a1, const char* name, bool readHeader, void* customHeader)
 {
-	logger::info("Parsing header for %s", name);
+	logger::write("rpf", "Parsing header for %s", name);
 
 	bool ret = ParseHeaderOrig(a1, name, readHeader, customHeader);
 	if (ret)

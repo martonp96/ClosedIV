@@ -29,7 +29,7 @@ void InitialMountHook()
 	rootDevice->SetPath(cwd.string().c_str(), true, nullptr);
 
 	if (rootDevice->Mount("mods:/"))
-		logger::info("Root device mounted!");
+		logger::write("info", "Root device mounted!");
 
 	rage::fiDeviceRelative* platformDevice = new rage::fiDeviceRelative();
 	rage::fiDeviceRelative* platformDeviceCRC = new rage::fiDeviceRelative();

@@ -14,7 +14,7 @@ void HookGetSystemTimeAsFileTime(LPFILETIME lpSystemTimeAsFileTime)
 
 		memory::InitFuncs::run();
 
-		logger::info("ClosedIV Inited!");
+		logger::write("info", "ClosedIV Inited!");
 	}
 	GetSystemTimeAsFileTime(lpSystemTimeAsFileTime);
 }
@@ -25,16 +25,21 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  dwReason, LPVOID lpReserved)
 	{
 		DisableThreadLibraryCalls(hModule);
 
-		AllocConsole();
+		config::load();
 
-		FILE* unused = nullptr;
-		freopen_s(&unused, "CONIN$", "r", stdin);
-		freopen_s(&unused, "CONOUT$", "w", stdout);
-		freopen_s(&unused, "CONOUT$", "w", stderr);
+		if (config::get_config<bool>("console"))
+		{
+			AllocConsole();
+
+			FILE* unused = nullptr;
+			freopen_s(&unused, "CONIN$", "r", stdin);
+			freopen_s(&unused, "CONOUT$", "w", stdout);
+			freopen_s(&unused, "CONOUT$", "w", stderr);
+		}
 
 		//compatibility for any asi loader, as OpenIV supports only the one made by Alexander Blade
 		if (!memory::HookIAT("kernel32.dll", "GetSystemTimeAsFileTime", (PVOID)HookGetSystemTimeAsFileTime, (PVOID*)&origGetSystemTimeAsFileTime)) {
-			logger::info("[-] Hooking failed error (%ld)", GetLastError());
+			logger::write("info", "Hooking failed error (%ld)", GetLastError());
 		}
     }
     return TRUE;
