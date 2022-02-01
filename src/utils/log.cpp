@@ -15,7 +15,7 @@ void logger::write(const char* type, const char* msg, ...)
 
 	if (config::get_log(type))
 	{
-		std::ofstream logFile("ClosedIV.log", std::ofstream::out);
+		std::ofstream logFile("ClosedIV.log", std::ofstream::out | std::ofstream::app);
 		logFile.write(buffer, strlen(buffer));
 		logFile.write("\n", 1);
 		logFile.close();
