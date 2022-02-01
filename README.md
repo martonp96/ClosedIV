@@ -26,7 +26,7 @@ Check the [wiki](https://github.com/martonp96/ClosedIV/wiki) for more informatio
 
 ## Goals
 - [x] Initial release
-- [ ] Adding log files
+- [x] Adding log files
 - [ ] Adding logs to debug mods created by people, so they know what is wrong with their broken stuff
 - [ ] Adding support to replace files without copying the entire RPF
 - [ ] Support RPFs as directories
