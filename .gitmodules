@@ -1,0 +1,3 @@
+[submodule "src/vendor/minhook"]
+	path = src/vendor/minhook
+	url = ../../TsudaKageyu/minhook.git

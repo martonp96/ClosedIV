@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <vector>
 #include <functional>
+#include "vendor/minhook/include/MinHook.h"
 #include "log.h"
 
 class memory {
@@ -62,6 +63,10 @@ public:
 	{
 		memory::base() = (uintptr_t)GetModuleHandle(NULL);
 		memory::virtual_mem() = memory((uintptr_t)VirtualAlloc((void*)(base() + 0x20000000), 1024, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE), false);
+
+		auto status = MH_Initialize();
+		if (status != MH_OK)
+			logger::write("info", "Mh init failed %d", (int)status);
 	}
 
 	template <typename T>
@@ -141,6 +146,44 @@ public:
 	{
 		return ((R(*)(Args...))address)(args...);
 	}
+
+	template<class T>
+	void hook(T* target, T** orig = nullptr)
+	{
+		auto status = MH_CreateHook((void*)address, (void*)target, (void**)orig);		
+		if (status != MH_OK)
+			logger::write("info", "MH_CreateHook failed %d", (int)status);
+
+		status = MH_EnableHook(MH_ALL_HOOKS);
+		if (status != MH_OK)
+			logger::write("info", "MH_EnableHook failed %d", (int)status);
+	}
+
+	template<typename RetType, typename... Args>
+	class func
+	{
+		using FuncType = RetType(__fastcall*)(Args...);
+		FuncType mainFunc;
+
+		std::string sig;
+	public:
+		func(const char* _sig) : sig(_sig), mainFunc(nullptr)
+		{
+			new InitFuncs([this] {
+				this->run();
+			});
+		}
+
+		void run()
+		{
+			mainFunc = memory::scan(sig.c_str()).as<FuncType>();
+		}
+
+		RetType operator()(Args...args)
+		{
+			return this->mainFunc(args...);
+		}
+	};
 
 	static BOOL HookIAT(const char* szModuleName, const char* szFuncName, PVOID pNewFunc, PVOID* pOldFunc)
 	{//https://guidedhacking.com/threads/how-to-hook-import-address-table-iat-hooking.13555/
