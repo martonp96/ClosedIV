@@ -26,6 +26,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  dwReason, LPVOID lpReserved)
 		DisableThreadLibraryCalls(hModule);
 
 		config::load();
+		
+		logger::init();
 
 		if (config::get_config<bool>("console"))
 		{

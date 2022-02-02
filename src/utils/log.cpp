@@ -1,5 +1,13 @@
 #include "main.h"
 
+void logger::init()
+{
+	if(std::filesystem::exists("ClosedIV.log"))
+	{
+		std::filesystem::remove("ClosedIV.log");
+	}
+}
+
 void logger::write(const char* type, const char* msg, ...)
 {
 	char buffer[256]{ 0 };
@@ -18,6 +26,7 @@ void logger::write(const char* type, const char* msg, ...)
 		std::ofstream logFile("ClosedIV.log", std::ofstream::out | std::ofstream::app);
 		logFile.write(buffer, strlen(buffer));
 		logFile.write("\n", 1);
+		logFile.flush();
 		logFile.close();
 	}
 }
