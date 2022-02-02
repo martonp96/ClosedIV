@@ -7,6 +7,7 @@ This repository contains the source code for ClosedIV.asi, an open source altern
 - open source
 - supports all features of OpenIV.asi
 - supports multiple different versions of ASI Loaders (Recommended: https://github.com/ThirteenAG/Ultimate-ASI-Loader)
+- adds a new way to load mods (see Info section)
 
 ## How to build
 
