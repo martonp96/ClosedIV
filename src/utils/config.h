@@ -23,6 +23,7 @@ public:
 			get_ini()["log"]["info"] = true;
 			get_ini()["log"]["mods"] = false;
 			get_ini()["log"]["rpf"] = false;
+			get_ini()["log"]["device"] = false;
 			save();
 		}
 	}

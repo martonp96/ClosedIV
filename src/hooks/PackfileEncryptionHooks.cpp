@@ -32,7 +32,7 @@ void DecryptHeader2Hook(uint32_t encryption, uint32_t salt, char* header, int na
 bool(*ParseHeaderOrig)(rage::fiPackfile*, const char*, bool, void*);
 bool ParseHeaderHook(rage::fiPackfile* a1, const char* name, bool readHeader, void* customHeader)
 {
-	logger::write("rpf", "Parsing header for %s", name);
+	//logger::write("rpf", "Parsing header for %s", name);
 
 	bool ret = ParseHeaderOrig(a1, name, readHeader, customHeader);
 	if (ret)
