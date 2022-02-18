@@ -68,8 +68,8 @@ void InitialMountHook()
 
 static memory::func<rage::fiDevice*, const char*, bool> GetDeviceHook("48 89 5C 24 ? 88 54 24 10 55 56 57 41 54 41 55 41 56 41 57 48 83 EC 20 48 8D 15 ? ? ? ? 41 B8");
 
-char (*OpenArchiveOrig)(rage::fiPackfile* a1, const char* path, char smth, int32_t type);
-char OpenArchiveHook(rage::fiPackfile* a1, const char* path, char smth, int32_t type)
+char (*OpenArchiveOrig)(rage::fiPackfile* a1, const char* path, char smth, int32_t type, __int64 a5);
+char OpenArchiveHook(rage::fiPackfile* a1, const char* path, char smth, int32_t type, __int64 a5)
 {
 	auto device = GetDeviceHook(path, true);
 	if (device && IsCustomDevice((rage::fiDeviceLocal*)device))
@@ -81,7 +81,7 @@ char OpenArchiveHook(rage::fiPackfile* a1, const char* path, char smth, int32_t 
 		}
 		logger::write("device", "Opening archive %s %d %d", path, smth, type);
 	}
-	return OpenArchiveOrig(a1, path, smth, type);
+	return OpenArchiveOrig(a1, path, smth, type, a5);
 }
 
 static memory::InitFuncs CustomDevice([] {
